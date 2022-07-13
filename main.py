@@ -14,11 +14,17 @@ decisionsA = []
 decisionsB = []
 doubles = []
 doubleOutcomes = []
+
+
+cardCountResults = [0] * 101
 def game():
     # Clear hands and reset antes
     jord.reset()
     dan.reset()
     deala.reset()
+    low = sum(s.numRem[1:6])
+    high = s.numRem[0] + s.numRem[-1]
+    cardCount = low-high
 
     # Draw First Cards
     jord.addCard(s.turnCard())
@@ -41,12 +47,20 @@ def game():
 
     decision = " "
     decB = " "
+    followedTable = True
     while (decision == "H" or decision == " ") and jord.hand() < 21:
-        dealerOdds = model.dealerProbs(s, [deala.cardsInHand[0]])
-        print(dealerOdds)
+        #print()
+        dealerOdds = model.updatedDealerOdds(s, [deala.cardsInHand[0]])
+        #print(dealerOdds)
         # print("Dealer Odds: " + str(dealerOdds))
-        decision = model.hitWinOdds(dealerOdds, jord.cardsInHand, s)
         decB = model.hitorstand(s, deala, jord)
+        decision = model.hitWinOdds(dealerOdds, jord.cardsInHand, s, decB)
+
+        if decision != decB:
+            followedTable = False
+            print(dealerOdds)
+            print(jord.cardsInHand, deala.cardsInHand[0])
+            print(decision, decB)
 
         if decision == "S":
             pass
@@ -58,11 +72,9 @@ def game():
             jord.addCard(s.turnCard())
 
 
-    print("Jord: " + str(jord.cardsInHand))
-    print("Dealer:" + str(deala.cardsInHand[0]))
-    print()
-    print(decision)
-    print(decB)
+    # print("Jord: " + str(jord.cardsInHand))
+    # print("Dealer:" + str(deala.cardsInHand[0]))
+
     decisionsA.append(decision)
     decisionsB.append(decB)
 
@@ -82,7 +94,9 @@ def game():
     while deala.hand() < 17:
         deala.addCard(s.turnCard())
 
-    print(deala.cardsInHand)
+    # print(deala.cardsInHand)
+
+    # This function is to verify the utility of doubling
     if decision == 'D':
         doubles.append([dan.cardsInHand, dan.hand(), deala.cardsInHand, deala.hand()])
         if deala.hand() > 21:
@@ -100,35 +114,45 @@ def game():
     if jord.hand() == 21:
         # print("Jord Wins")
         jord.money += jord.ante
+        cardCountResults[51 + cardCount] += 1
     elif 21 > jord.hand() > deala.hand():
         # print("Jord wins")
         jord.money += jord.ante
+        cardCountResults[51 + cardCount] += 1
     elif 21 > jord.hand() and deala.hand() > 21:
         # print("Jord wins")
         jord.money += jord.ante
+        cardCountResults[51 + cardCount] += 1
     elif jord.hand() < 21 and jord.hand() == deala.hand():
         # print("Jord Tie")
         pass
     else:
         # print("Jord Loss")
         jord.money -= jord.ante
+        cardCountResults[51 + cardCount] -= 1
 
+    if not followedTable:
+        print(jord.hand(), deala.hand())
 
     if dan.hand() == 21:
         # print("dan Wins")
         dan.money += dan.ante
+        cardCountResults[51 + cardCount] += 1
     elif 21 > dan.hand() > deala.hand():
         # print("Dan wins")
         dan.money += dan.ante
+        cardCountResults[51 + cardCount] += 1
     elif 21 > dan.hand() and deala.hand() > 21:
         # print("Dan Wins")
         dan.money += dan.ante
+        cardCountResults[51 + cardCount] += 1
     elif dan.hand() < 21 and dan.hand() == deala.hand():
         # print("Dan Tie")
         pass
     else:
         # print("Dan Loss")
         dan.money -= dan.ante
+        cardCountResults[51 + cardCount] -= 1
 
 
 # Press the green button in the gutter to run the script.
@@ -138,12 +162,12 @@ if __name__ == '__main__':
     mon = [0]
     monD = [0]
     t = time.time()
-    numGames = 10000
+    numGames = 500
 
     # Run game specified number of times
     for i in range(numGames):
         # If shoe has fewer than 25 cards left then reshuffle it
-        if s.count() < 25:
+        if s.count() < 20:
             s = shoe(5)
 
         game()
@@ -154,11 +178,10 @@ if __name__ == '__main__':
         # if i % (numGames/10) == 0:
         #     print(str(i/(numGames/10)) + "% Finished")
 
-    print(doubles)
+    #print(doubles)
     print(sum(doubleOutcomes))
-    #
-    # print(decisionsA)
-    # print(decisionsB)
+
+    print(cardCountResults)
 
     plt.plot(range(len(mon)), mon)
     plt.plot(range(len(monD)), monD)
@@ -166,3 +189,8 @@ if __name__ == '__main__':
     plt.show()
     print(time.time()-t)
 
+    plt.bar(range(-50,51,1), cardCountResults)
+    plt.title('+/- vs. card count')
+    plt.xlabel('Card Count')
+    plt.ylabel('Wins - Losses')
+    plt.show()

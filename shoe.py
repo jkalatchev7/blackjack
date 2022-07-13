@@ -10,13 +10,13 @@ class shoe():
 
     def turnCard(self):
         card = self.shoe.pop()
-        try:
-            self.numRem[int(card) - 1] = self.numRem[int(card) - 1] - 1
-        except:
-            if card == 'A':
-                self.numRem[0] = self.numRem[0] - 1
-            else:
-                self.numRem[9] = self.numRem[9] - 1
+        # try:
+        #     self.numRem[int(card) - 1] = self.numRem[int(card) - 1] - 1
+        # except:
+        #     if card == 'A':
+        #         self.numRem[0] = self.numRem[0] - 1
+        #     else:
+        #         self.numRem[9] = self.numRem[9] - 1
 
         return card
 
