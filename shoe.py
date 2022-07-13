@@ -6,17 +6,19 @@ class shoe():
         self.shoe = ['A','2','3','4','5','6','7','8','9','10', 'J', 'Q', 'K'] * 4 * numDecks
         self.numRem = [4 * numDecks] * 10
         self.numRem[9] = self.numRem[9] * 4
+        self.cardCount = 0
         random.shuffle(self.shoe)
 
     def turnCard(self):
         card = self.shoe.pop()
-        # try:
-        #     self.numRem[int(card) - 1] = self.numRem[int(card) - 1] - 1
-        # except:
-        #     if card == 'A':
-        #         self.numRem[0] = self.numRem[0] - 1
-        #     else:
-        #         self.numRem[9] = self.numRem[9] - 1
+        try:
+            val = int(card)
+            if val == 10:
+                self.cardCount -= 1
+            elif val < 7:
+                self.cardCount += 1
+        except:
+            self.cardCount -= 1
 
         return card
 
