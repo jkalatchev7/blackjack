@@ -60,8 +60,7 @@ def possibleHands(dealerUpCard):
             temp.append(str(i + 1))
 
         valueOfHand = hand(temp)
-        if valueOfHand >= 17:
-            print("".join(temp))
+        if valueOfHand > 17 or (valueOfHand == 17 and not isSoft(temp)):
             possibleHands.append("".join(temp))
 
         else:
@@ -74,7 +73,7 @@ def possibleHands(dealerUpCard):
                 else:
                     tempB.append(str(j + 1))
                 valueOfHand = hand(tempB)
-                if valueOfHand >= 17:
+                if valueOfHand > 17 or (valueOfHand == 17 and not isSoft(temp)):
                     possibleHands.append("".join(tempB))
 
                 else:
@@ -88,7 +87,7 @@ def possibleHands(dealerUpCard):
                             tempC.append(str(k + 1))
 
                         valueOfHand = hand(tempC)
-                        if valueOfHand >= 17:
+                        if valueOfHand > 17 or (valueOfHand == 17 and not isSoft(temp)):
                             possibleHands.append("".join(tempC))
 
                         else:
@@ -103,7 +102,7 @@ def possibleHands(dealerUpCard):
 
                                 valueOfHand = hand(tempD)
 
-                                if valueOfHand >= 17:
+                                if valueOfHand > 17 or (valueOfHand == 17 and not isSoft(temp)):
                                     possibleHands.append("".join(tempD))
 
                                 else:
@@ -118,7 +117,7 @@ def possibleHands(dealerUpCard):
 
                                         valueOfHand = hand(tempE)
 
-                                        if valueOfHand >= 17:
+                                        if valueOfHand > 17 or (valueOfHand == 17 and not isSoft(temp)):
                                             possibleHands.append("".join(tempE))
 
                                         else:
@@ -133,7 +132,7 @@ def possibleHands(dealerUpCard):
 
                                                 valueOfHand = hand(tempF)
 
-                                                if valueOfHand >= 17:
+                                                if valueOfHand > 17 or (valueOfHand == 17 and not isSoft(temp)):
                                                     possibleHands.append("".join(tempF))
                                                 else:
                                                     for jj in range(10):
@@ -147,7 +146,7 @@ def possibleHands(dealerUpCard):
 
                                                         valueOfHand = hand(tempG)
 
-                                                        if valueOfHand >= 17:
+                                                        if valueOfHand > 17 or (valueOfHand == 17 and not isSoft(temp)):
                                                             possibleHands.append("".join(tempG))
 
                                                         else:

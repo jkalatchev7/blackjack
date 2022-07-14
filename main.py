@@ -6,6 +6,8 @@ import model
 import time
 import matplotlib.pyplot as plt
 # Initialize deck
+from utils import isSoft
+
 s = shoe(5)
 jord = player()
 dan = player()
@@ -91,9 +93,14 @@ def game():
             dan.addCard(s.turnCard())
 
 
-    # Dealer plays out his hand
-    while deala.hand() < 17:
+    # Dealer plays out his hand (Hits on soft 17)
+    while deala.hand() <= 17:
+        if deala.hand() == 17 and isSoft(deala.cardsInHand):
+            deala.addCard(s.turnCard())
+        else:
+            pass
         deala.addCard(s.turnCard())
+
 
     # Check result for Jord
     if jord.hand() == 21:
