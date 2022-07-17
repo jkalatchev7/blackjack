@@ -16,8 +16,8 @@ deala = dealer()
 decisionsA = []
 decisionsB = []
 doubles = []
-doubleOutcomes = []
-doubleOutcomes_j = []
+doubleOutcomes_d = {"Win":0, "Loss":0, "Push":0}
+doubleOutcomes_j = {"Win":0, "Loss":0, "Push":0}
 
 cardCountResults = [0] * 101
 
@@ -90,6 +90,8 @@ def game():
                 player.addCard(s.turnCard())
 
             print(jord.cardsInHand, dan.cardsInHand, deala.cardsInHand[0])
+            
+        player.lastDecision = final_decision
 
     for player in players:
         if handTotal(player.cardsInHand) == 21:
@@ -107,12 +109,17 @@ def game():
             pass
         deala.addCard(s.turnCard())
 
-    print(jord.cardsInHand, dan.cardsInHand, deala.cardsInHand)
+
     # If decision went against the table then print hands involved
     if not followedTable:
         print(handTotal(jord.cardsInHand), handTotal(deala.cardsInHand))
 
-    # TODO: Here add Mike's outcome stuff
+    # Check result for Jord
+    jord.outcome(deala.cardsInHand, doubleOutcomes_j, cardCount, cardCountResults)
+
+    # Check result for Dan
+    dan.outcome(deala.cardsInHand, doubleOutcomes_d, cardCount, cardCountResults)
+
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -137,9 +144,9 @@ if __name__ == '__main__':
         # if i % (numGames/10) == 0:
         #     print(str(i/(numGames/10)) + "% Finished")
 
-    # print(doubles)
-    print("Double Jord (W-L): ", sum(doubleOutcomes_j))
-    print("Double Dan (W-L): ", sum(doubleOutcomes))
+
+    print("Double Jord (W-L-D): ", str(doubleOutcomes_j["Wins"]) + "-" + str(doubleOutcomes_j["Loss"]) + "-" + str(doubleOutcomes_j["Push"]))
+    print("Double Dan (W-L-D): ", str(doubleOutcomes_d["Wins"]) + "-" + str(doubleOutcomes_d["Loss"]) + "-" + str(doubleOutcomes_d["Push"]))
 
     print("Above 0: ", sum(cardCountResults[51:]))
     print("Below 0: ", sum(cardCountResults[0:51]))
