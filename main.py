@@ -6,7 +6,7 @@ import model
 import time
 import matplotlib.pyplot as plt
 # Initialize deck
-from utils import isSoft
+from utils import hand, isSoft
 
 s = shoe(5)
 jord = player()
@@ -15,8 +15,8 @@ deala = dealer()
 decisionsA = []
 decisionsB = []
 doubles = []
-doubleOutcomes = []
-doubleOutcomes_j = []
+doubleOutcomes_d = {"Win":0, "Loss":0, "Push":0}
+doubleOutcomes_j = {"Win":0, "Loss":0, "Push":0}
 
 
 cardCountResults = [0] * 101
@@ -36,12 +36,19 @@ def game():
     jord.addCard(s.turnCard())
     dan.addCard(s.turnCard())
     deala.addCard(s.turnCard())
+    
+    ## Check for Surrender
+    if (hand(dan.cardsInHand) == 15 and deala.cardsInHand[0] == 10) or (hand(dan.cardsInHand) == 16 and deala.cardsInHand[0] in (9,10,'A')): 
+        dan.money -= dan.ante / 2
+        #return  UPDATE
+    if (hand(jord.cardsInHand) == 15 and deala.cardsInHand[0] == 10) or (hand(jord.cardsInHand) == 16 and deala.cardsInHand[0] in (9,10,'A')): 
+        jord.money -= jord.ante / 2
+        #return  UPDATE
 
     # Check if dealer has blackjack
     # TODO: Include Insurance Decision Here
     if deala.hand() == 21:
         # print("Dealer has Blackjack")
-
         jord.money -= jord.ante
         dan.money -= dan.ante
         return
@@ -79,19 +86,15 @@ def game():
     decisionsA.append(decision_j)
     decisionsB.append(decB_j)
 
-    decision = " "
-    while (decision == "H" or decision == " ") and dan.hand() < 21:
-        decision = model.hitorstand(s, deala, dan)
-        if decision == "S":
-            pass
-        elif decision == "D":
+    decision_d = " "
+    while decision_d in ("H", " ") and dan.hand() < 21:
+        decision_d = model.hitorstand(s, deala, dan)
+        if decision_d == "S": pass
+        elif decision_d == "D":
             dan.ante *= 2
             dan.addCard(s.turnCard())
             pass
-
-        else:
-            dan.addCard(s.turnCard())
-
+        else: dan.addCard(s.turnCard())
 
     # Dealer plays out his hand (Hits on soft 17)
     while deala.hand() <= 17:
@@ -101,73 +104,14 @@ def game():
             pass
         deala.addCard(s.turnCard())
 
-
     # Check result for Jord
-    if jord.hand() == 21:
-        # print("Jord Wins")
-        if decision_j == 'D':
-            doubleOutcomes_j.append(1)
-        jord.money += jord.ante
-        cardCountResults[51 + cardCount] += 1
-    elif 21 > jord.hand() > deala.hand():
-        # print("Jord wins")
-        if decision_j == 'D':
-            doubleOutcomes_j.append(1)
-        jord.money += jord.ante
-        cardCountResults[51 + cardCount] += 1
-    elif 21 > jord.hand() and deala.hand() > 21:
-        # print("Jord wins")
-        if decision_j == 'D':
-            doubleOutcomes_j.append(1)
-        jord.money += jord.ante
-        cardCountResults[51 + cardCount] += 1
-    elif jord.hand() < 21 and jord.hand() == deala.hand():
-        # print("Jord Tie")
-        if decision_j == 'D':
-            doubleOutcomes_j.append(0)
-        pass
-    else:
-        # print("Jord Loss")
-        if decision_j == 'D':
-            doubleOutcomes_j.append(-1)
-        jord.money -= jord.ante
-        cardCountResults[51 + cardCount] -= 1
+    jord.outcome(deala.cardsInHand, decision_j, doubleOutcomes_j, cardCount, cardCountResults)
 
     # If decision went against the table then print hands involved
-    if not followedTable:
-        print(jord.hand(), deala.hand())
+    if not followedTable: print(jord.hand(), deala.hand())
 
     # Check result for Dan
-    if dan.hand() == 21:
-        # print("dan Wins")
-        if decision == 'D':
-            doubleOutcomes.append(1)
-        dan.money += dan.ante
-        cardCountResults[51 + cardCount] += 1
-    elif 21 > dan.hand() > deala.hand():
-        # print("Dan wins")
-        if decision == 'D':
-            doubleOutcomes.append(1)
-        dan.money += dan.ante
-        cardCountResults[51 + cardCount] += 1
-    elif 21 > dan.hand() and deala.hand() > 21:
-        # print("Dan Wins")
-        if decision == 'D':
-            doubleOutcomes.append(1)
-        dan.money += dan.ante
-        cardCountResults[51 + cardCount] += 1
-    elif dan.hand() < 21 and dan.hand() == deala.hand():
-        # print("Dan Tie")
-        if decision == 'D':
-            doubleOutcomes.append(0)
-        pass
-    else:
-        # print("Dan Loss")
-        if decision == 'D':
-            doubleOutcomes.append(-1)
-        dan.money -= dan.ante
-        cardCountResults[51 + cardCount] -= 1
-
+    dan.outcome(deala.cardsInHand, decision_d, doubleOutcomes_d, cardCount, cardCountResults)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -193,8 +137,8 @@ if __name__ == '__main__':
         #     print(str(i/(numGames/10)) + "% Finished")
 
     #print(doubles)
-    print("Double Jord (W-L): ", sum(doubleOutcomes_j))
-    print("Double Dan (W-L): ", sum(doubleOutcomes))
+    print("Double Jord (W-L-D): ", str(doubleOutcomes_j["Wins"]) + "-" + str(doubleOutcomes_j["Loss"]) + "-" + str(doubleOutcomes_j["Push"]))
+    print("Double Dan (W-L-D): ", str(doubleOutcomes_d["Wins"]) + "-" + str(doubleOutcomes_d["Loss"]) + "-" + str(doubleOutcomes_d["Push"]))
 
     print("Above 0: ", sum(cardCountResults[51:]))
     print("Below 0: ", sum(cardCountResults[0:51]))

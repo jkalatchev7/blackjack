@@ -1,8 +1,9 @@
 from utils import *
 import numpy as np
 from shoe import  shoe
-softChoices = np.array([
-    # A   2   3   4   5   6   7   8   9  10   DEALER
+
+softChoices = np.array([  # H = Hit, S = Stand, D = Double 
+    # A    2    3    4    5    6    7    8    9   10   DEALER
     ['H', 'H', 'H', 'H', 'H', 'H', 'H', 'H', 'H', 'H'],  # A, A
     ['H', 'H', 'H', 'H', 'D', 'D', 'H', 'H', 'H', 'H'],  # A, 2
     ['H', 'H', 'H', 'H', 'D', 'D', 'H', 'H', 'H', 'H'],  # A, 3
@@ -13,8 +14,8 @@ softChoices = np.array([
     ['S', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'S'],  # A, 8
     ['S', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'S']])  # A, 9
 
-hardChoices = np.array([
-    # A   2   3   4   5   6   7   8   9  10   DEALER
+hardChoices = np.array([  # H = Hit, S = Stand, D = Double 
+    # A    2    3    4    5    6    7    8    9   10   DEALER
     ['H', 'H', 'D', 'D', 'D', 'D', 'H', 'H', 'H', 'H'],  # 9
     ['H', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'H'],  # 10
     ['H', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D'],  # 11
@@ -26,6 +27,19 @@ hardChoices = np.array([
     ['S', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'S'],  # 17
 ])
 
+splits = np.array([  # Y = Split, N = Don't Split
+    # A    2    3    4    5    6    7    8    9   10   DEALER
+    ['Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y'],  # A,A
+    ['N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N'],  # 10,10
+    ['N', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'Y', 'Y', 'N'],  # 9,9
+    ['Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y'],  # 8,8
+    ['N', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'N', 'N'],  # 7,7
+    ['N', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'N', 'N', 'N'],  # 6,6
+    ['N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N'],  # 5,5
+    ['N', 'N', 'N', 'N', 'Y', 'Y', 'N', 'N', 'N', 'N'],  # 4,4
+    ['N', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'N', 'N'],  # 3,3
+    ['N', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'N', 'N'],  # 2,2
+])
 
 def value(card):
     try:
@@ -63,179 +77,7 @@ def hitorstand(shoe, deala, player):
             if action == 'D' and not doubleAllowed:
                 action = 'H'
             return action
-
-
-# def dealerProbs(shoe, dealerUpCard):
-#     dealerOutcomes = [0] * 6
-#     arr = []
-#     probs = []
-#     dealerProbabilities = [0] * 6
-#     remaining = 0
-#     for i in range(10):
-#         temp = dealerUpCard[:]
-#         if i == 0:
-#             temp.append('A')
-#         else:
-#             temp.append(str(i + 1))
-#
-#         valueOfHand = hand(temp)
-#         if valueOfHand >= 17:
-#             prob = likelihood(shoe, temp)
-#             arr.append(temp)
-#             probs.append(prob)
-#             if valueOfHand > 21:
-#                 dealerOutcomes[-1] += 1
-#                 dealerProbabilities[-1] += prob
-#             else:
-#                 dealerOutcomes[valueOfHand - 17] += 1
-#                 dealerProbabilities[valueOfHand - 17] += prob
-#             continue
-#         else:
-#             for j in range(10):
-#                 tempB = temp[:]
-#                 if j == 0:
-#                     tempB.append('A')
-#                 else:
-#                     tempB.append(str(j + 1))
-#
-#                 valueOfHand = hand(tempB)
-#                 prob = likelihood(shoe, tempB)
-#                 if valueOfHand >= 17:
-#                     arr.append(tempB)
-#                     probs.append(prob)
-#                     if valueOfHand > 21:
-#                         dealerOutcomes[-1] += 1
-#                         dealerProbabilities[-1] += prob
-#                     else:
-#                         dealerOutcomes[valueOfHand - 17] += 1
-#                         dealerProbabilities[valueOfHand - 17] += prob
-#                     continue
-#                 else:
-#                     for k in range(10):
-#                         tempC = tempB[:]
-#                         if k == 0:
-#                             tempC.append('A')
-#                         else:
-#                             tempC.append(str(k + 1))
-#
-#                         valueOfHand = hand(tempC)
-#                         prob = likelihood(shoe, tempC)
-#                         if valueOfHand >= 17:
-#                             arr.append(tempC)
-#                             probs.append(prob)
-#                             if valueOfHand > 21:
-#                                 dealerOutcomes[-1] += 1
-#                                 dealerProbabilities[-1] += prob
-#                             else:
-#                                 dealerOutcomes[valueOfHand - 17] += 1
-#                                 dealerProbabilities[valueOfHand - 17] += prob
-#                             continue
-#                         else:
-#                             for l in range(10):
-#                                 tempD = tempC[:]
-#                                 if l == 0:
-#                                     tempD.append('A')
-#                                 else:
-#                                     tempD.append(str(l + 1))
-#
-#                                 valueOfHand = hand(tempD)
-#                                 prob = likelihood(shoe, tempD)
-#                                 if valueOfHand >= 17:
-#                                     arr.append(tempD)
-#                                     probs.append(prob)
-#                                     if valueOfHand > 21:
-#                                         dealerOutcomes[-1] += 1
-#                                         dealerProbabilities[-1] += prob
-#                                     else:
-#                                         dealerOutcomes[valueOfHand - 17] += 1
-#                                         dealerProbabilities[valueOfHand - 17] += prob
-#                                     continue
-#                                 else:
-#                                     for p in range(10):
-#                                         tempE = tempD[:]
-#                                         if p == 0:
-#                                             tempE.append('A')
-#                                         else:
-#                                             tempE.append(str(p + 1))
-#
-#                                         valueOfHand = hand(tempE)
-#                                         prob = likelihood(shoe, tempE)
-#                                         if valueOfHand >= 17:
-#                                             arr.append(tempE)
-#                                             probs.append(prob)
-#                                             if valueOfHand > 21:
-#                                                 dealerOutcomes[-1] += 1
-#                                                 dealerProbabilities[-1] += prob
-#                                             else:
-#                                                 dealerOutcomes[valueOfHand - 17] += 1
-#                                                 dealerProbabilities[valueOfHand - 17] += prob
-#                                             continue
-#                                         else:
-#                                             for ii in range(10):
-#                                                 tempF = tempE[:]
-#                                                 if ii == 0:
-#                                                     tempF.append('A')
-#                                                 else:
-#                                                     tempF.append(str(ii + 1))
-#
-#                                                 valueOfHand = hand(tempF)
-#                                                 prob = likelihood(shoe, tempF)
-#                                                 if valueOfHand >= 17:
-#                                                     arr.append(tempF)
-#                                                     probs.append(prob)
-#                                                     if valueOfHand > 21:
-#                                                         dealerOutcomes[-1] += 1
-#                                                         dealerProbabilities[-1] += prob
-#                                                     else:
-#                                                         dealerOutcomes[valueOfHand - 17] += 1
-#                                                         dealerProbabilities[valueOfHand - 17] += prob
-#                                                     continue
-#                                                 else:
-#                                                     for jj in range(10):
-#                                                         tempG = tempF[:]
-#                                                         if jj == 0:
-#                                                             tempG.append('A')
-#                                                         else:
-#                                                             tempG.append(str(jj + 1))
-#
-#                                                         valueOfHand = hand(tempG)
-#                                                         prob = likelihood(shoe, tempG)
-#                                                         if valueOfHand >= 17:
-#                                                             arr.append(tempG)
-#                                                             probs.append(prob)
-#                                                             if valueOfHand > 21:
-#                                                                 dealerOutcomes[-1] += 1
-#                                                                 dealerProbabilities[-1] += prob
-#                                                             else:
-#                                                                 dealerOutcomes[valueOfHand - 17] += 1
-#                                                                 dealerProbabilities[valueOfHand - 17] += prob
-#                                                             continue
-#                                                         else:
-#                                                             for kk in range(10):
-#                                                                 tempH = tempG[:]
-#                                                                 if kk == 0:
-#                                                                     tempH.append('A')
-#                                                                 else:
-#                                                                     tempH.append(str(kk + 1))
-#
-#                                                                 valueOfHand = hand(tempH)
-#                                                                 prob = likelihood(shoe, tempH)
-#                                                                 if valueOfHand >= 17:
-#                                                                     arr.append(tempH)
-#                                                                     probs.append(prob)
-#                                                                     if valueOfHand > 21:
-#                                                                         dealerOutcomes[-1] += 1
-#                                                                         dealerProbabilities[-1] += prob
-#                                                                     else:
-#                                                                         dealerOutcomes[valueOfHand - 17] += 1
-#                                                                         dealerProbabilities[valueOfHand - 17] += prob
-#                                                                     continue
-#                                                                 else:
-#                                                                     remaining += 1
-#                                                                     continue
-#
-#     return dealerProbabilities
-
+        
 
 def likelihood(shoe, hand):
     counts = shoe.numRem[:]
