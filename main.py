@@ -1,16 +1,17 @@
 # This is where the game will be run
 from shoe import shoe
-from player import player
+from player import Player
 from dealer import dealer
 import model
 import time
 import matplotlib.pyplot as plt
-# Initialize deck
-from utils import isSoft
+
+from utils import isSoft, handTotal
 
 s = shoe(5)
-jord = player()
-dan = player()
+jord = Player("Jordan")
+jord.followsTable = False
+dan = Player("Dan")
 deala = dealer()
 decisionsA = []
 decisionsB = []
@@ -18,156 +19,100 @@ doubles = []
 doubleOutcomes = []
 doubleOutcomes_j = []
 
-
 cardCountResults = [0] * 101
+
+
 def game():
+    print("=============== New Game =================")
     # Clear hands and reset antes
-    jord.reset()
-    dan.reset()
-    deala.reset()
+    players = [jord, dan, deala]
     cardCount = s.cardCount
 
-    # Draw First Cards
-    jord.addCard(s.turnCard())
-    dan.addCard(s.turnCard())
-    deala.addCard(s.turnCard())
+    # Reset the player's hands and antes and the dealer's hand
+    for player in players:
+        player.reset()
 
-    # Draw Seconds Cards
-    jord.addCard(s.turnCard())
-    dan.addCard(s.turnCard())
-    deala.addCard(s.turnCard())
+    # Pass out cards to everyone (2 players and dealer)
+    for i in range(2):
+        for player in players:
+            player.addCard(s.turnCard())
+
+    print(jord.cardsInHand, dan.cardsInHand, deala.cardsInHand[0])
+
+    # For non-dealer players check for blackjack
+    for player in players[0:-1]:
+        if handTotal(player.cardsInHand) == 21:
+            print("blackjack ", player.name)
+            player.cardsInHand = []
+            player.money += player.ante * 1.5
+            cardCountResults[51 + cardCount] += 1
+            players.remove(player)
 
     # Check if dealer has blackjack
     # TODO: Include Insurance Decision Here
-    if deala.hand() == 21:
-        # print("Dealer has Blackjack")
-
-        jord.money -= jord.ante
-        dan.money -= dan.ante
+    if handTotal(deala.cardsInHand) == 21:
+        print("Dealer Blackjack")
+        for player in players[0:-1]:
+            player.money -= player.ante
         return
 
-    decision_j = " "
-    decB_j = " "
     followedTable = True
-    while (decision_j == "H" or decision_j == " ") and jord.hand() < 21:
-        #print()
-        dealerOdds = model.updatedDealerOdds(s, [deala.cardsInHand[0]])
-        #print(dealerOdds)
-        # print("Dealer Odds: " + str(dealerOdds))
-        decB_j = model.hitorstand(s, deala, jord)
-        decision_j = model.hitWinOdds(dealerOdds, jord.cardsInHand, s, decB_j)
 
-        if decision_j != decB_j:
-            followedTable = False
-            print(dealerOdds)
-            print(jord.cardsInHand, deala.cardsInHand[0])
-            print(decision_j, decB_j)
+    # Play out player hands
+    for player in players[0:-1]:
+        print(player.name)
+        final_decision = " "
+        while (final_decision in ("H", " ")) and handTotal(player.cardsInHand) <= 21:
+            dealerOdds = model.updatedDealerOdds(s, [deala.cardsInHand[0]])
+            # decision_table is basic method: following table
+            decision_table = model.hitorstand(s, deala, jord)
+            # This is the other method - our calculations
+            decision = model.hitWinOdds(dealerOdds, jord.cardsInHand, s, final_decision)
 
-        if decision_j == "S":
-            pass
-        elif decision_j == "D":
-            jord.ante *= 2
-            jord.addCard(s.turnCard())
-            pass
-        else:
-            jord.addCard(s.turnCard())
+            if player.followsTable:
+                final_decision = decision_table
+            else:
+                final_decision = decision
 
+            # if decision != decision_table:
+            #     followedTable = False
+            #     print(dealerOdds)
+            #     print(jord.cardsInHand, deala.cardsInHand[0])
+            #     print(decision, decision_table)
 
-    # print("Jord: " + str(jord.cardsInHand))
-    # print("Dealer:" + str(deala.cardsInHand[0]))
+            if final_decision == "S":
+                pass
+            elif final_decision == "D":
+                player.ante *= 2
+                player.addCard(s.turnCard())
+                pass
+            else:
+                player.addCard(s.turnCard())
 
-    decisionsA.append(decision_j)
-    decisionsB.append(decB_j)
+            print(jord.cardsInHand, dan.cardsInHand, deala.cardsInHand[0])
 
-    decision = " "
-    while (decision == "H" or decision == " ") and dan.hand() < 21:
-        decision = model.hitorstand(s, deala, dan)
-        if decision == "S":
-            pass
-        elif decision == "D":
-            dan.ante *= 2
-            dan.addCard(s.turnCard())
-            pass
-
-        else:
-            dan.addCard(s.turnCard())
-
+    for player in players:
+        if handTotal(player.cardsInHand) == 21:
+            print("21 ", player.name)
+            player.cardsInHand = []
+            player.money += player.ante
+            cardCountResults[51 + cardCount] += 1
+            players.remove(player)
 
     # Dealer plays out his hand (Hits on soft 17)
-    while deala.hand() <= 17:
-        if deala.hand() == 17 and isSoft(deala.cardsInHand):
+    while handTotal(deala.cardsInHand) <= 17:
+        if handTotal(deala.cardsInHand) == 17 and isSoft(deala.cardsInHand):
             deala.addCard(s.turnCard())
         else:
             pass
         deala.addCard(s.turnCard())
 
-
-    # Check result for Jord
-    if jord.hand() == 21:
-        # print("Jord Wins")
-        if decision_j == 'D':
-            doubleOutcomes_j.append(1)
-        jord.money += jord.ante
-        cardCountResults[51 + cardCount] += 1
-    elif 21 > jord.hand() > deala.hand():
-        # print("Jord wins")
-        if decision_j == 'D':
-            doubleOutcomes_j.append(1)
-        jord.money += jord.ante
-        cardCountResults[51 + cardCount] += 1
-    elif 21 > jord.hand() and deala.hand() > 21:
-        # print("Jord wins")
-        if decision_j == 'D':
-            doubleOutcomes_j.append(1)
-        jord.money += jord.ante
-        cardCountResults[51 + cardCount] += 1
-    elif jord.hand() < 21 and jord.hand() == deala.hand():
-        # print("Jord Tie")
-        if decision_j == 'D':
-            doubleOutcomes_j.append(0)
-        pass
-    else:
-        # print("Jord Loss")
-        if decision_j == 'D':
-            doubleOutcomes_j.append(-1)
-        jord.money -= jord.ante
-        cardCountResults[51 + cardCount] -= 1
-
+    print(jord.cardsInHand, dan.cardsInHand, deala.cardsInHand)
     # If decision went against the table then print hands involved
     if not followedTable:
-        print(jord.hand(), deala.hand())
+        print(handTotal(jord.cardsInHand), handTotal(deala.cardsInHand))
 
-    # Check result for Dan
-    if dan.hand() == 21:
-        # print("dan Wins")
-        if decision == 'D':
-            doubleOutcomes.append(1)
-        dan.money += dan.ante
-        cardCountResults[51 + cardCount] += 1
-    elif 21 > dan.hand() > deala.hand():
-        # print("Dan wins")
-        if decision == 'D':
-            doubleOutcomes.append(1)
-        dan.money += dan.ante
-        cardCountResults[51 + cardCount] += 1
-    elif 21 > dan.hand() and deala.hand() > 21:
-        # print("Dan Wins")
-        if decision == 'D':
-            doubleOutcomes.append(1)
-        dan.money += dan.ante
-        cardCountResults[51 + cardCount] += 1
-    elif dan.hand() < 21 and dan.hand() == deala.hand():
-        # print("Dan Tie")
-        if decision == 'D':
-            doubleOutcomes.append(0)
-        pass
-    else:
-        # print("Dan Loss")
-        if decision == 'D':
-            doubleOutcomes.append(-1)
-        dan.money -= dan.ante
-        cardCountResults[51 + cardCount] -= 1
-
+    # TODO: Here add Mike's outcome stuff
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -176,7 +121,7 @@ if __name__ == '__main__':
     mon = [0]
     monD = [0]
     t = time.time()
-    numGames = 500
+    numGames = 5
 
     # Run game specified number of times
     for i in range(numGames):
@@ -192,7 +137,7 @@ if __name__ == '__main__':
         # if i % (numGames/10) == 0:
         #     print(str(i/(numGames/10)) + "% Finished")
 
-    #print(doubles)
+    # print(doubles)
     print("Double Jord (W-L): ", sum(doubleOutcomes_j))
     print("Double Dan (W-L): ", sum(doubleOutcomes))
 
@@ -200,11 +145,11 @@ if __name__ == '__main__':
     print("Below 0: ", sum(cardCountResults[0:51]))
     plt.plot(range(len(mon)), mon)
     plt.plot(range(len(monD)), monD)
-    #plt.legend("Prob Approach", "Following Chart")
+    # plt.legend("Prob Approach", "Following Chart")
     plt.show()
-    print(time.time()-t)
+    print(time.time() - t)
 
-    plt.bar(range(-50,51,1), cardCountResults)
+    plt.bar(range(-50, 51, 1), cardCountResults)
     plt.title('+/- vs. card count')
     plt.xlabel('Card Count')
     plt.ylabel('Wins - Losses')

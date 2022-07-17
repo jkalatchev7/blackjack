@@ -48,18 +48,21 @@ def hitorstand(shoe, deala, player):
 
     if isSoft(playerCards):
         # Soft Hand
-        action = softChoices[player.hand() - 12][dealerVal - 1]
+        action = softChoices[handTotal(player.cardsInHand) - 12][dealerVal - 1]
         if action == 'D' and not doubleAllowed:
             action = 'H'
         return action
     else:
         # Hard Hand
-        if player.hand() < 9:
+
+        valueOfHand = handTotal(player.cardsInHand)
+
+        if valueOfHand < 9:
             return 'H'
-        elif player.hand() > 16:
+        elif valueOfHand > 16:
             return 'S'
         else:
-            action = hardChoices[player.hand() - 9][dealerVal - 1]
+            action = hardChoices[handTotal(player.cardsInHand) - 9][dealerVal - 1]
             if action == 'D' and not doubleAllowed:
                 action = 'H'
             return action
@@ -78,7 +81,7 @@ def hitorstand(shoe, deala, player):
 #         else:
 #             temp.append(str(i + 1))
 #
-#         valueOfHand = hand(temp)
+#         valueOfHand = handTotal(temp)
 #         if valueOfHand >= 17:
 #             prob = likelihood(shoe, temp)
 #             arr.append(temp)
@@ -98,7 +101,7 @@ def hitorstand(shoe, deala, player):
 #                 else:
 #                     tempB.append(str(j + 1))
 #
-#                 valueOfHand = hand(tempB)
+#                 valueOfHand = handTotal(tempB)
 #                 prob = likelihood(shoe, tempB)
 #                 if valueOfHand >= 17:
 #                     arr.append(tempB)
@@ -118,7 +121,7 @@ def hitorstand(shoe, deala, player):
 #                         else:
 #                             tempC.append(str(k + 1))
 #
-#                         valueOfHand = hand(tempC)
+#                         valueOfHand = handTotal(tempC)
 #                         prob = likelihood(shoe, tempC)
 #                         if valueOfHand >= 17:
 #                             arr.append(tempC)
@@ -138,7 +141,7 @@ def hitorstand(shoe, deala, player):
 #                                 else:
 #                                     tempD.append(str(l + 1))
 #
-#                                 valueOfHand = hand(tempD)
+#                                 valueOfHand = handTotal(tempD)
 #                                 prob = likelihood(shoe, tempD)
 #                                 if valueOfHand >= 17:
 #                                     arr.append(tempD)
@@ -158,7 +161,7 @@ def hitorstand(shoe, deala, player):
 #                                         else:
 #                                             tempE.append(str(p + 1))
 #
-#                                         valueOfHand = hand(tempE)
+#                                         valueOfHand = handTotal(tempE)
 #                                         prob = likelihood(shoe, tempE)
 #                                         if valueOfHand >= 17:
 #                                             arr.append(tempE)
@@ -178,7 +181,7 @@ def hitorstand(shoe, deala, player):
 #                                                 else:
 #                                                     tempF.append(str(ii + 1))
 #
-#                                                 valueOfHand = hand(tempF)
+#                                                 valueOfHand = handTotal(tempF)
 #                                                 prob = likelihood(shoe, tempF)
 #                                                 if valueOfHand >= 17:
 #                                                     arr.append(tempF)
@@ -198,7 +201,7 @@ def hitorstand(shoe, deala, player):
 #                                                         else:
 #                                                             tempG.append(str(jj + 1))
 #
-#                                                         valueOfHand = hand(tempG)
+#                                                         valueOfHand = handTotal(tempG)
 #                                                         prob = likelihood(shoe, tempG)
 #                                                         if valueOfHand >= 17:
 #                                                             arr.append(tempG)
@@ -218,7 +221,7 @@ def hitorstand(shoe, deala, player):
 #                                                                 else:
 #                                                                     tempH.append(str(kk + 1))
 #
-#                                                                 valueOfHand = hand(tempH)
+#                                                                 valueOfHand = handTotal(tempH)
 #                                                                 prob = likelihood(shoe, tempH)
 #                                                                 if valueOfHand >= 17:
 #                                                                     arr.append(tempH)
@@ -264,7 +267,7 @@ def updatedDealerOdds(shoe, dealerUpCard):
 
     for possibleHand in dealerHands:
         prob = likelihood(shoe, possibleHand)
-        valueOfHand = hand(possibleHand)
+        valueOfHand = handTotal(possibleHand)
         if valueOfHand > 21:
             dealerProbs[-1] += prob
         else:
@@ -274,7 +277,7 @@ def updatedDealerOdds(shoe, dealerUpCard):
 
 def winOdds(dealerOdds, playerCards):
     dealerTotalProbs = dealerOdds[:]
-    val = hand(playerCards)
+    val = handTotal(playerCards)
     bustProb = dealerTotalProbs[-1]
     if val > 21:
         win, tie, loss = 0, 0, 1
@@ -291,14 +294,14 @@ def winOdds(dealerOdds, playerCards):
 
 
 def hitWinOdds(dealerOdds, playerCards, s, decTable):
-    if hand(playerCards) < 7:
+    if handTotal(playerCards) < 7:
         return 'H'
     currentWinOdds = winOdds(dealerOdds, playerCards)
     #print(currentWinOdds)
     initalExpectedEarnings = currentWinOdds[0] - currentWinOdds[2]
     counts = s.numRem[:]
     totalWin, totalTie, totalLoss = 0, 0, 0
-    if hand(playerCards) == 14:
+    if handTotal(playerCards) == 14:
         pass
     for i in range(10):
         tempCards = playerCards[:]

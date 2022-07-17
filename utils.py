@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def hand(cardsInHand):
+def handTotal(cardsInHand):
     total = 0
     numAces = 0
     for i in cardsInHand:
