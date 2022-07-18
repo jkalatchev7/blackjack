@@ -1,8 +1,7 @@
 import numpy as np
 
 def handTotal(cardsInHand):
-    total = 0
-    numAces = 0
+    total, numAces = 0, 0
     for i in cardsInHand:
         try:
             total += int(i)
@@ -21,8 +20,7 @@ def handTotal(cardsInHand):
 
 
 def isSoft(cardsInHand):
-    total = 0
-    numAces = 0
+    total, numAces = 0, 0
     ace = False
     for i in cardsInHand:
         try:
