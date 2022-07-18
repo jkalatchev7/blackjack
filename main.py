@@ -109,16 +109,16 @@ def game():
             pass
         deala.addCard(s.turnCard())
 
-
+    print(jord.cardsInHand, dan.cardsInHand, deala.cardsInHand)
     # If decision went against the table then print hands involved
     if not followedTable:
         print(handTotal(jord.cardsInHand), handTotal(deala.cardsInHand))
 
     # Check result for Jord
-    jord.outcome(deala.cardsInHand, doubleOutcomes_j, cardCount, cardCountResults)
+    print(jord.outcome(deala.cardsInHand, doubleOutcomes_j, cardCount, cardCountResults))
 
     # Check result for Dan
-    dan.outcome(deala.cardsInHand, doubleOutcomes_d, cardCount, cardCountResults)
+    print(dan.outcome(deala.cardsInHand, doubleOutcomes_d, cardCount, cardCountResults))
 
 
 # Press the green button in the gutter to run the script.
@@ -145,8 +145,8 @@ if __name__ == '__main__':
         #     print(str(i/(numGames/10)) + "% Finished")
 
 
-    print("Double Jord (W-L-D): ", str(doubleOutcomes_j["Wins"]) + "-" + str(doubleOutcomes_j["Loss"]) + "-" + str(doubleOutcomes_j["Push"]))
-    print("Double Dan (W-L-D): ", str(doubleOutcomes_d["Wins"]) + "-" + str(doubleOutcomes_d["Loss"]) + "-" + str(doubleOutcomes_d["Push"]))
+    print("Double Jord (W-L-D): ", str(doubleOutcomes_j["Win"]) + "-" + str(doubleOutcomes_j["Loss"]) + "-" + str(doubleOutcomes_j["Push"]))
+    print("Double Dan (W-L-D): ", str(doubleOutcomes_d["Win"]) + "-" + str(doubleOutcomes_d["Loss"]) + "-" + str(doubleOutcomes_d["Push"]))
 
     print("Above 0: ", sum(cardCountResults[51:]))
     print("Below 0: ", sum(cardCountResults[0:51]))

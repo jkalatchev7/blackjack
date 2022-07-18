@@ -62,18 +62,20 @@ def hitorstand(shoe, deala, player):
 
     if isSoft(playerCards):
         # Soft Hand
-        action = softChoices[player.hand() - 12][dealerVal - 1]
+        if handTotal(player.cardsInHand) >= 18:
+            return 'S'
+        action = softChoices[handTotal(player.cardsInHand) - 12][dealerVal - 1]
         if action == 'D' and not doubleAllowed:
             action = 'H'
         return action
     else:
         # Hard Hand
-        if player.hand() < 9:
+        if handTotal(player.cardsInHand) < 9:
             return 'H'
-        elif player.hand() > 16:
+        elif handTotal(player.cardsInHand) > 16:
             return 'S'
         else:
-            action = hardChoices[player.hand() - 9][dealerVal - 1]
+            action = hardChoices[handTotal(player.cardsInHand) - 9][dealerVal - 1]
             if action == 'D' and not doubleAllowed:
                 action = 'H'
             return action
@@ -106,7 +108,7 @@ def updatedDealerOdds(shoe, dealerUpCard):
 
     for possibleHand in dealerHands:
         prob = likelihood(shoe, possibleHand)
-        valueOfHand = hand(possibleHand)
+        valueOfHand = handTotal(possibleHand)
         if valueOfHand > 21:
             dealerProbs[-1] += prob
         else:
@@ -116,7 +118,7 @@ def updatedDealerOdds(shoe, dealerUpCard):
 
 def winOdds(dealerOdds, playerCards):
     dealerTotalProbs = dealerOdds[:]
-    val = hand(playerCards)
+    val = handTotal(playerCards)
     bustProb = dealerTotalProbs[-1]
     if val > 21:
         win, tie, loss = 0, 0, 1
@@ -133,14 +135,14 @@ def winOdds(dealerOdds, playerCards):
 
 
 def hitWinOdds(dealerOdds, playerCards, s, decTable):
-    if hand(playerCards) < 7:
+    if handTotal(playerCards) < 7:
         return 'H'
     currentWinOdds = winOdds(dealerOdds, playerCards)
     #print(currentWinOdds)
     initalExpectedEarnings = currentWinOdds[0] - currentWinOdds[2]
     counts = s.numRem[:]
     totalWin, totalTie, totalLoss = 0, 0, 0
-    if hand(playerCards) == 14:
+    if handTotal(playerCards) == 14:
         pass
     for i in range(10):
         tempCards = playerCards[:]

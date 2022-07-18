@@ -25,17 +25,20 @@ class Player:
         Also takes in arguments such as doubleOutcomes, cardCountResults, etc. and updates them based on argument decision and the outcome.
         """
         dealerSum = handTotal(dealerHand)
-        for hand in self.cardsInHand:
+        for hand in [self.cardsInHand]:
             if hand:  # account for empty hands where player already won
                 playerSum = handTotal(hand)
                 if (21 > playerSum) and (playerSum > dealerSum or dealerSum > 21):  # player wins!
                     self.money += self.ante
                     if self.lastDecision == "D": doubleOutcomes["Win"] += 1
                     cardCountResults[51 + cardCount] += 1
+                    return "W"
                 elif (21 > playerSum) and (playerSum == dealerSum):  # push
                     if self.lastDecision == "D": doubleOutcomes["Push"] += 1
+                    return "D"
                     pass
                 else:  # dealer wins
                     self.money -= self.ante
                     if self.lastDecision == "D": doubleOutcomes["Loss"] += 1
                     cardCountResults[51 + cardCount] -= 1
+                    return "L"

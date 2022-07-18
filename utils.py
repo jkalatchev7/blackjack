@@ -1,6 +1,5 @@
 import numpy as np
 
-
 def handTotal(cardsInHand):
     total = 0
     numAces = 0
@@ -59,7 +58,7 @@ def possibleHands(dealerUpCard):
         else:
             temp.append(str(i + 1))
 
-        valueOfHand = hand(temp)
+        valueOfHand = handTotal(temp)
         if valueOfHand > 17 or (valueOfHand == 17 and not isSoft(temp)):
             possibleHands.append("".join(temp))
 
@@ -72,7 +71,7 @@ def possibleHands(dealerUpCard):
                     tempB.append('F')
                 else:
                     tempB.append(str(j + 1))
-                valueOfHand = hand(tempB)
+                valueOfHand = handTotal(tempB)
                 if valueOfHand > 17 or (valueOfHand == 17 and not isSoft(temp)):
                     possibleHands.append("".join(tempB))
 
@@ -86,7 +85,7 @@ def possibleHands(dealerUpCard):
                         else:
                             tempC.append(str(k + 1))
 
-                        valueOfHand = hand(tempC)
+                        valueOfHand = handTotal(tempC)
                         if valueOfHand > 17 or (valueOfHand == 17 and not isSoft(temp)):
                             possibleHands.append("".join(tempC))
 
@@ -100,7 +99,7 @@ def possibleHands(dealerUpCard):
                                 else:
                                     tempD.append(str(l + 1))
 
-                                valueOfHand = hand(tempD)
+                                valueOfHand = handTotal(tempD)
 
                                 if valueOfHand > 17 or (valueOfHand == 17 and not isSoft(temp)):
                                     possibleHands.append("".join(tempD))
@@ -115,7 +114,7 @@ def possibleHands(dealerUpCard):
                                         else:
                                             tempE.append(str(p + 1))
 
-                                        valueOfHand = hand(tempE)
+                                        valueOfHand = handTotal(tempE)
 
                                         if valueOfHand > 17 or (valueOfHand == 17 and not isSoft(temp)):
                                             possibleHands.append("".join(tempE))
@@ -130,7 +129,7 @@ def possibleHands(dealerUpCard):
                                                 else:
                                                     tempF.append(str(ii + 1))
 
-                                                valueOfHand = hand(tempF)
+                                                valueOfHand = handTotal(tempF)
 
                                                 if valueOfHand > 17 or (valueOfHand == 17 and not isSoft(temp)):
                                                     possibleHands.append("".join(tempF))
@@ -144,7 +143,7 @@ def possibleHands(dealerUpCard):
                                                         else:
                                                             tempG.append(str(jj + 1))
 
-                                                        valueOfHand = hand(tempG)
+                                                        valueOfHand = handTotal(tempG)
 
                                                         if valueOfHand > 17 or (valueOfHand == 17 and not isSoft(temp)):
                                                             possibleHands.append("".join(tempG))
@@ -159,7 +158,7 @@ def possibleHands(dealerUpCard):
                                                                 else:
                                                                     tempH.append(str(kk + 1))
 
-                                                                valueOfHand = hand(tempH)
+                                                                valueOfHand = handTotal(tempH)
                                                                 if valueOfHand >= 17:
                                                                     possibleHands.append("".join(tempH))
 
