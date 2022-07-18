@@ -172,7 +172,7 @@ def possibleHands(dealerUpCard):
 
 
 # Method to compute and save the possible hands for each dealer upcard... so we don't have to compute this every time
-def createTable():
+def updatePossibleHandCSV():
     possibleHands(['A'])
     possibleHands(['2'])
     possibleHands(['3'])
@@ -183,3 +183,4 @@ def createTable():
     possibleHands(['8'])
     possibleHands(['9'])
     possibleHands(['F'])
+

@@ -114,6 +114,7 @@ def game():
     if not followedTable:
         print(handTotal(jord.cardsInHand), handTotal(deala.cardsInHand))
 
+
     # Check result for Jord
     print(jord.outcome(deala.cardsInHand, doubleOutcomes_j, cardCount, cardCountResults))
 
@@ -128,7 +129,7 @@ if __name__ == '__main__':
     mon = [0]
     monD = [0]
     t = time.time()
-    numGames = 5
+    numGames = 10
 
     # Run game specified number of times
     for i in range(numGames):

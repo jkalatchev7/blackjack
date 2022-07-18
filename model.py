@@ -1,7 +1,8 @@
+import json
+
 from utils import *
 import numpy as np
-from shoe import  shoe
-
+from shoe import shoe
 softChoices = np.array([  # H = Hit, S = Stand, D = Double 
     # A    2    3    4    5    6    7    8    9   10   DEALER
     ['H', 'H', 'H', 'H', 'H', 'H', 'H', 'H', 'H', 'H'],  # A, A
@@ -165,12 +166,75 @@ def hitWinOdds(dealerOdds, playerCards, s, decTable):
     else:
         doubleEarnings = -1
     earn = [hitEarnings, standEarnings, doubleEarnings]
+    print(max(earn))
     i = earn.index(max([hitEarnings, standEarnings, doubleEarnings]))
 
     possibilities = ['H','S','D']
     dec = possibilities[i]
 
     if dec != decTable:
-        print("Stand: " + str(currentWinOdds))
-        print("Hit: " + str([totalWin, totalTie, totalLoss]))
+        #print("Stand: " + str(currentWinOdds))
+        #print("Hit: " + str([totalWin, totalTie, totalLoss]))
+        pass
     return dec
+
+
+# Create table
+def createTable():
+    holder = []
+    hardHands, softHands = {}, {}
+    options = ['A','2','3','4','5','6','7','8','9','10']
+    s = shoe(5)
+    prettyHard, prettySoft = np.chararray([9,10]), np.chararray([10,10])
+    for i in options:
+        for j in options:
+            for k in options:
+                dealerOdds = updatedDealerOdds(s, [k])
+                decision = hitWinOdds(dealerOdds, [i, j], s, " ")
+                val = str(handTotal([i,j]))
+                if 'A' in (i,j):  # soft total
+                    softHands[str(val) + "-" + k] = decision
+                elif i == j:
+                    #splits[str([val, k])] = decision
+                    continue
+                else:  # hard total
+                    hardHands[str(val) + "-" + k] = decision
+                # holder.append([(i, j), k, decision])
+
+    for i, j in softHands.items():
+        print(i, j)
+        row = int(i.split("-")[0]) - 12
+        try:
+            column = int(i.split("-")[1])  - 1
+        except Exception as e:
+            column = 0
+        prettySoft[row, column] = j
+
+    for i, j in hardHands.items():
+        row = int(i.split("-")[0]) - 8
+        if row < 0 or row > 8:
+            continue
+        try:
+            column = int(i.split("-")[1])  - 1
+        except Exception as e:
+            column = 0
+
+        prettyHard[row, column] = j
+
+
+    print(prettySoft)
+    print(prettyHard)
+
+    with open('tables/soft.txt', 'w') as convert_file:
+        convert_file.write(json.dumps(softHands))
+
+    with open('tables/hard.txt', 'w') as convert_file:
+        convert_file.write(json.dumps(hardHands))
+
+    with open('tables/split.txt', 'w') as convert_file:
+        convert_file.write(json.dumps(splits))
+
+    print(softHands)
+    print(hardHands)
+    print(splits)
+createTable()
