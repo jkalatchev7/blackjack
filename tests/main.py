@@ -48,9 +48,9 @@ def game():
 
     if deala.cardsInHand[0] == "A":  # check for insurance
         if deala.cardsInHand[1] in ("10", "J", "Q", "K"):  # insurance hits
-            for player in players: player.insuranceOutcome["Success"] += 1
+            for player in players[:-1]: player.insuranceOutcomes["Success"] += 1
         else:  # insurance fails
-            for player in players: player.insuranceOutcome["Fail"] += 1
+            for player in players[:-1]: player.insuranceOutcomes["Fail"] += 1
     
     if handTotal(deala.cardsInHand) == 21:  # check for blackjack
         print("Dealer Blackjack")

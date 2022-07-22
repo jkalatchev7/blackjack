@@ -102,9 +102,10 @@ def calc_dealerOdds(shoe, dealerUpCard):
     dealerUpCard = dealerUpCard[0]
     if dealerUpCard == '10' or dealerUpCard == 'K' or dealerUpCard == 'Q' or dealerUpCard == 'J':
         path = '../possibleDealerHands/dealerF.csv'
+    elif dealerUpCard == 'A':
+        path = '../possibleDealerHands/dealerA.csv'
     else:
         path = '../possibleDealerHands/dealer' + str(dealerUpCard) + '.csv'
-
     dealerHands = np.genfromtxt(path, dtype=np.str_, delimiter=',')
 
     # Odds of outcomes [17, 18, 19, 20, 21, BUST]
@@ -140,7 +141,7 @@ def winOdds(dealerOdds, playerCards):
 
 
 def hitWinOdds(dealerUpCard, playerCards, s, decTable):
-    dealerOdds = calc_dealerOdds(s, dealerUpCard)
+    dealerOdds = calc_dealerOdds(s, [dealerUpCard])
     if handTotal(playerCards) < 7:
         return 'H'
     currentWinOdds = winOdds(dealerOdds, playerCards)
