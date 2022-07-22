@@ -11,3 +11,11 @@ Gives your odds of winning if you stand and if you hit, informing your decision 
 - Perhaps add functionality to allow someone to play a game and have the probablities and suggest mode show up each hand
 - Account for multiple hands, splitting
 - Clean up Code
+
+
+## Results Eventually
+- Make the repository presentable
+	- Create Tests Folder
+	- Create Resources Folder (Classes)
+- Add Splitting
+- Add GUI to allow users to play

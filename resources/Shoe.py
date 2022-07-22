@@ -1,7 +1,7 @@
 import random
 
 
-class shoe():
+class Shoe():
     def __init__(self, numDecks):
         self.shoe = ['A','2','3','4','5','6','7','8','9','10', 'J', 'Q', 'K'] * 4 * numDecks
         self.numRem = [4 * numDecks] * 10

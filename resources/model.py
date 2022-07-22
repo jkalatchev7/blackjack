@@ -1,9 +1,10 @@
 import json
 
-from utils import *
+from resources.utils import *
 import numpy as np
-from shoe import shoe
-softChoices = np.array([  # H = Hit, S = Stand, D = Double 
+from resources.Shoe import Shoe
+
+softChoices = np.array([  # H = Hit, S = Stand, D = Double
     # A    2    3    4    5    6    7    8    9   10   DEALER
     ['H', 'H', 'H', 'H', 'H', 'H', 'H', 'H', 'H', 'H'],  # A, A
     ['H', 'H', 'H', 'H', 'D', 'D', 'H', 'H', 'H', 'H'],  # A, 2
@@ -42,6 +43,7 @@ splits = np.array([  # Y = Split, N = Don't Split
     ['N', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'N', 'N'],  # 2,2
 ])
 
+
 def value(card):
     try:
         return int(card)
@@ -50,6 +52,7 @@ def value(card):
             return 11
         else:
             return 10
+
 
 # Method to play directly by the table
 def hitorstand(shoe, deala, player):
@@ -80,7 +83,7 @@ def hitorstand(shoe, deala, player):
             if action == 'D' and not doubleAllowed:
                 action = 'H'
             return action
-        
+
 
 def likelihood(shoe, hand):
     counts = shoe.numRem[:]
@@ -95,12 +98,12 @@ def likelihood(shoe, hand):
     return total
 
 
-def updatedDealerOdds(shoe, dealerUpCard):
+def calc_dealerOdds(shoe, dealerUpCard):
     dealerUpCard = dealerUpCard[0]
     if dealerUpCard == '10' or dealerUpCard == 'K' or dealerUpCard == 'Q' or dealerUpCard == 'J':
-        path = 'data/dealerF.csv'
+        path = '../possibleDealerHands/dealerF.csv'
     else:
-        path = 'data/dealer' + str(dealerUpCard) + '.csv'
+        path = '../possibleDealerHands/dealer' + str(dealerUpCard) + '.csv'
 
     dealerHands = np.genfromtxt(path, dtype=np.str_, delimiter=',')
 
@@ -116,6 +119,7 @@ def updatedDealerOdds(shoe, dealerUpCard):
             dealerProbs[valueOfHand - 17] += prob
 
     return dealerProbs
+
 
 def winOdds(dealerOdds, playerCards):
     dealerTotalProbs = dealerOdds[:]
@@ -135,11 +139,12 @@ def winOdds(dealerOdds, playerCards):
     return [win, tie, loss]
 
 
-def hitWinOdds(dealerOdds, playerCards, s, decTable):
+def hitWinOdds(dealerUpCard, playerCards, s, decTable):
+    dealerOdds = calc_dealerOdds(s, dealerUpCard)
     if handTotal(playerCards) < 7:
         return 'H'
     currentWinOdds = winOdds(dealerOdds, playerCards)
-    #print(currentWinOdds)
+    # print(currentWinOdds)
     initalExpectedEarnings = currentWinOdds[0] - currentWinOdds[2]
     counts = s.numRem[:]
     totalWin, totalTie, totalLoss = 0, 0, 0
@@ -158,7 +163,7 @@ def hitWinOdds(dealerOdds, playerCards, s, decTable):
         totalWin += prob * win
         totalTie += prob * tie
         totalLoss += prob * loss
-    #print([totalWin, totalTie, totalLoss])
+    # print([totalWin, totalTie, totalLoss])
     hitEarnings = totalWin - totalLoss
     standEarnings = initalExpectedEarnings
     if len(playerCards) < 3:
@@ -166,15 +171,15 @@ def hitWinOdds(dealerOdds, playerCards, s, decTable):
     else:
         doubleEarnings = -1
     earn = [hitEarnings, standEarnings, doubleEarnings]
-    print(max(earn))
+    print("Expected returns [H,S,D]: " + str(earn))
     i = earn.index(max([hitEarnings, standEarnings, doubleEarnings]))
 
-    possibilities = ['H','S','D']
+    possibilities = ['H', 'S', 'D']
     dec = possibilities[i]
 
     if dec != decTable:
-        #print("Stand: " + str(currentWinOdds))
-        #print("Hit: " + str([totalWin, totalTie, totalLoss]))
+        # print("Stand: " + str(currentWinOdds))
+        # print("Hit: " + str([totalWin, totalTie, totalLoss]))
         pass
     return dec
 
@@ -183,19 +188,19 @@ def hitWinOdds(dealerOdds, playerCards, s, decTable):
 def createTable():
     holder = []
     hardHands, softHands = {}, {}
-    options = ['A','2','3','4','5','6','7','8','9','10']
-    s = shoe(5)
-    prettyHard, prettySoft = np.chararray([9,10]), np.chararray([10,10])
+    options = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+    s = Shoe(5)
+    prettyHard, prettySoft = np.chararray([9, 10]), np.chararray([10, 10])
     for i in options:
         for j in options:
             for k in options:
-                dealerOdds = updatedDealerOdds(s, [k])
-                decision = hitWinOdds(dealerOdds, [i, j], s, " ")
-                val = str(handTotal([i,j]))
-                if 'A' in (i,j):  # soft total
+                #dealerOdds = calc_dealerOdds(s, [k])
+                decision = hitWinOdds([k], [i, j], s, " ")
+                val = str(handTotal([i, j]))
+                if 'A' in (i, j):  # soft total
                     softHands[str(val) + "-" + k] = decision
                 elif i == j:
-                    #splits[str([val, k])] = decision
+                    # splits[str([val, k])] = decision
                     continue
                 else:  # hard total
                     hardHands[str(val) + "-" + k] = decision
@@ -205,7 +210,7 @@ def createTable():
         print(i, j)
         row = int(i.split("-")[0]) - 12
         try:
-            column = int(i.split("-")[1])  - 1
+            column = int(i.split("-")[1]) - 1
         except Exception as e:
             column = 0
         prettySoft[row, column] = j
@@ -215,26 +220,27 @@ def createTable():
         if row < 0 or row > 8:
             continue
         try:
-            column = int(i.split("-")[1])  - 1
+            column = int(i.split("-")[1]) - 1
         except Exception as e:
             column = 0
 
         prettyHard[row, column] = j
 
-
     print(prettySoft)
     print(prettyHard)
 
-    with open('tables/soft.txt', 'w') as convert_file:
+    with open('../results/decision-tables/soft.txt', 'w') as convert_file:
         convert_file.write(json.dumps(softHands))
 
-    with open('tables/hard.txt', 'w') as convert_file:
+    with open('../results/decision-tables/hard.txt', 'w') as convert_file:
         convert_file.write(json.dumps(hardHands))
 
-    with open('tables/split.txt', 'w') as convert_file:
+    with open('../results/decision-tables/split.txt', 'w') as convert_file:
         convert_file.write(json.dumps(splits))
 
     print(softHands)
     print(hardHands)
     print(splits)
-createTable()
+
+
+#createTable()
