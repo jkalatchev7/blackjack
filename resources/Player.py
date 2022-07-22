@@ -1,4 +1,4 @@
-from utils import handTotal
+from resources.utils import handTotal
 class Player:
     def __init__(self, name="John"):
         self.money = 0

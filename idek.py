@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
-import model
-from shoe import shoe
+from resources import Shoe, model
+
 a  = np.array([
  ['H','H','D','D','D','D','H','H','H','H'],
  ['H','H','D','D','D','D','H','H','H','H'],
@@ -38,8 +38,8 @@ dfB = pd.DataFrame(b, index = ['8','9','10','11','12','13','14','15','16'], colu
 print(dfB)
 
 
-s = shoe(5)
-dealerOdds = model.updatedDealerOdds(s, ['A'])
+s = Shoe(5)
+dealerOdds = model.calc_dealerOdds(s, ['A'])
 model.hitWinOdds(dealerOdds, ['2', '3'], s, " ")
 model.hitWinOdds(dealerOdds, ['2', '4'], s, " ")
 model.hitWinOdds(dealerOdds, ['2', '5'], s, " ")

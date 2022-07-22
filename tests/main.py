@@ -1,17 +1,17 @@
 # This is where the game will be run
-from shoe import shoe
-from player import Player
-from dealer import dealer
-import model
+from resources.Shoe import Shoe
+from resources.Player import Player
+from resources.Dealer import Dealer
+from resources import model
 import time
 import matplotlib.pyplot as plt
 
-from utils import isSoft, handTotal
+from resources.utils import isSoft, handTotal
 
-s = shoe(5)
+s = Shoe(5)
 dan, jord = Player("Dan"), Player("Jordan")
 jord.followsTable = False
-deala = dealer()
+deala = Dealer()
 decisionsA, decisionsB, doubles = [], [], []
 
 cardCountResults = [0] * 101
@@ -47,7 +47,7 @@ def game():
             players.remove(player)
 
     if deala.cardsInHand[0] == "A":  # check for insurance
-        if deala.cardsInHand[1] in (10, "J", "Q", "K"):  # insurance hits
+        if deala.cardsInHand[1] in ("10", "J", "Q", "K"):  # insurance hits
             for player in players: player.insuranceOutcome["Success"] += 1
         else:  # insurance fails
             for player in players: player.insuranceOutcome["Fail"] += 1
@@ -64,11 +64,11 @@ def game():
         print(player.name)
         final_decision = " "
         while (final_decision in ("H", " ")) and handTotal(player.cardsInHand) <= 21:
-            dealerOdds = model.updatedDealerOdds(s, [deala.cardsInHand[0]])
+            #dealerOdds = model.calc_dealerOdds(s, [deala.cardsInHand[0]])
             # decision_table is basic method: following table
             decision_table = model.hitorstand(s, deala, jord)
             # This is the other method - our calculations
-            decision = model.hitWinOdds(dealerOdds, jord.cardsInHand, s, final_decision)
+            decision = model.hitWinOdds(deala.cardsInHand[0], jord.cardsInHand, s, final_decision)
 
             if player.followsTable: final_decision = decision_table
             else: final_decision = decision
@@ -104,10 +104,10 @@ def game():
 
 
     # Check result for Jord
-    print(jord.outcome(deala.cardsInHand, jord.doubleOutcomes, cardCount, cardCountResults))
+    print(jord.outcome(deala.cardsInHand, cardCount, cardCountResults))
 
     # Check result for Dan
-    print(dan.outcome(deala.cardsInHand, dan.doubleOutcomes, cardCount, cardCountResults))
+    print(dan.outcome(deala.cardsInHand, cardCount, cardCountResults))
 
 
 # Press the green button in the gutter to run the script.
@@ -123,16 +123,12 @@ if __name__ == '__main__':
     for i in range(numGames):
         # If shoe has fewer than 25 cards left then reshuffle it
         if s.count() < 20:
-            s = shoe(5)
+            s = Shoe(5)
 
         game()
 
         mon.append(jord.money)
         monD.append(dan.money)
-
-        # if i % (numGames/10) == 0:
-        #     print(str(i/(numGames/10)) + "% Finished")
-
 
     print("Double Jord (W-L-D): ", str(jord.doubleOutcomes["Win"]) + "-" + str(jord.doubleOutcomes["Loss"]) + "-" + str(jord.doubleOutcomes["Push"]))
     print("Double Dan (W-L-D): ", str(dan.doubleOutcomes["Win"]) + "-" + str(dan.doubleOutcomes["Loss"]) + "-" + str(dan.doubleOutcomes["Push"]))
